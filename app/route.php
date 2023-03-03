@@ -1,8 +1,11 @@
 <?php
 require_once "app/exception/NotFoundException.php";
 require_once "app/validation/Validation.php";
+require_once "app/database/Database.php";
+
 use app\exception\NotFoundException;
 use app\validation\Validation;
+use app\database\Database;
 
 class Route
 {
@@ -25,20 +28,23 @@ class Route
         $parts = $params["parts"]??[];
         array_unshift($parts, strtolower($this->method));
         $camelCase = implode('', $parts);
-        $this->{$camelCase}($params["params"], $params["queryParams"]);
-        return "aaa";
+        return $this->{$camelCase}($params["params"], $params["queryParams"]);
     }
 
     /**
      * Добавить запись
      */
-    public function postRecordsAdd($params = array(), $queryParams = array(), $postParams = array())
+    public function postRecordsAdd($params = array(), $queryParams = array())
     {
         $validation = [
             "name" => "required|string",
             "message" => "required|string",
         ];
         $validated = Validation::make($validation)->validate();
-        var_dump($validated);
+        $db = new Database();
+        $recordId = $db->insert("records", $validated);
+        return array(
+            "id" => $recordId
+        );
     }
 }

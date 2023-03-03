@@ -50,7 +50,9 @@ require_once __DIR__.'/app/route.php';
 $route = new Route($requestMethod);
 try
 {
-    $route->request($eUri);
+    $response = $route->request($eUri);
+    header('Content-Type: application/json');
+    echo json_encode($response);
 }
 catch(NotFoundException $e)
 {
