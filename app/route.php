@@ -18,7 +18,7 @@ class Route
 
     public function __call($method, $arguments)
     {
-        if(!method_exists($this, $method)) throw new NotFoundException();
+        if(!method_exists($this, $method)) throw new NotFoundException($method);
     }
 
 
@@ -46,5 +46,35 @@ class Route
         return array(
             "id" => $recordId
         );
+    }
+
+    /**
+     * Добавить коммент к записи
+     */
+    public function postRecordsRecordsIdCommentsAdd($params = array(), $queryParams = array())
+    {
+        $validation = [
+            "name" => "required|string",
+            "message" => "required|string",
+        ];
+        $validated = Validation::make($validation)->validate();
+        $validated["record_id"] = $params["RecordsId"];
+        $db = new Database();
+        $commentId = $db->insert("comments", $validated);
+        return array(
+            "id" => $commentId
+        );
+    }
+
+    /**
+     * Получить запись по ID
+     */
+    public function getRecordsRecordsId($params = array(), $queryParams = array())
+    {
+        $recordId = $params["RecordsId"];
+        $db = new Database();
+        $record = $db->selectOne("records", [], ["id" => $recordId]);
+        if(!$record) throw new NotFoundException("Record not found");
+        return $record;
     }
 }

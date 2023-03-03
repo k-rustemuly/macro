@@ -12,6 +12,9 @@ class Database
     private $charset = 'utf8';
     private $pdo;
 
+    /**
+     * Подключение к бд через pdo
+     */
     public function __construct()
     {
         $dsn = "mysql:host=$this->host;dbname=$this->db;charset=$this->charset";
@@ -23,6 +26,9 @@ class Database
         $this->pdo = new PDO($dsn, $this->user, $this->pass, $opt);
     }
 
+    /**
+     *  Подготовка данных
+     */
     private function clearData(array $data)
     {
         $set = '';
@@ -33,6 +39,22 @@ class Database
         return substr($set, 0, -2); 
     }
 
+    /**
+     * Данные из бд
+     */
+    private function select(string $table_name = "", array $fields = [], array $search = [])
+    {
+        $fields = implode(',', $fields);
+        if(empty($fields)) $fields = "*";
+        $sql = "SELECT $fields FROM $table_name WHERE ".$this->clearData(array_keys($search));
+        $stm = $this->pdo->prepare($sql);
+        $stm->execute($search);
+        return $stm;
+    }
+
+    /**
+     * Добавить новую запись
+     */
     public function insert(string $table_name = "", array $data = [])
     {
         $sql = "INSERT INTO $table_name SET ".$this->clearData(array_keys($data));
@@ -40,5 +62,15 @@ class Database
         $stm->execute($data);
         return $this->pdo->lastInsertId();
         
+    }
+
+    /**
+     * Выборка одной записи
+     */
+    public function selectOne(string $table_name = "", array $fields = [], array $search = [])
+    {
+        $stmt = $this->select($table_name, $fields, $search);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row;
     }
 }

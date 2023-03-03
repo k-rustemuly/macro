@@ -62,3 +62,7 @@ catch(ValidationException $e)
 {
     echo $e->getMessage();
 }
+catch (\PDOException $e)
+{
+    echo 'Ошибка с бд ';
+}
