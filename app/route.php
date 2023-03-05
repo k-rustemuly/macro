@@ -77,4 +77,54 @@ class Route
         if(!$record) throw new NotFoundException("Record not found");
         return $record;
     }
+
+    /**
+     * Получить список записей и последние 3 комментария к каждой записи. В выводе должно быть не больше 15 объектов. Предусмотреть пагинацию.
+     */
+    public function getRecords($params = array(), $queryParams = array())
+    {
+        $page = isset($queryParams["page"]) && $queryParams["page"]>0 ? $queryParams["page"] : 1;
+        $db = new Database();
+        $rows = $db->getRecordsWithCommentsByPage($page);
+        $records = array();
+        foreach($rows as $row)
+        {
+            $record_id = $row["id"];
+            $comment_id = $row['comment_id'];
+             // Если это новый пост, создаем новый объект поста
+            if (!isset($records[$record_id])) {
+                $records[$record_id] = array(
+                    "id" => $row["id"],
+                    "name" => $row["name"],
+                    "message" => $row["message"],
+                    "comments" => array()
+                );
+            }
+
+            // Если это новый комментарий, создаем новый объект комментария
+            if (!empty($comment_id)) {
+                $comment = array(
+                    "id" => $row["comment_id"],
+                    "name" => $row["comment_name"],
+                    "message" => $row["comment_message"]
+                );
+                
+                // Добавляем комментарий в массив комментариев поста
+                $records[$record_id]["comments"][] = $comment;
+            }
+        }
+        return array_values($records);
+    }
+
+    /**
+     * Получить список комментариев к записи
+     */
+    public function getRecordsRecordsIdComments($params = array(), $queryParams = array())
+    {
+        $recordId = $params["RecordsId"];
+        $db = new Database();
+        $comments = $db->selectAll("comments", ["id", "name", "message"], ["record_id" => $recordId]);
+        if(!$comments) throw new NotFoundException("Record not found");
+        return $comments;
+    }
 }

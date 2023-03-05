@@ -73,4 +73,23 @@ class Database
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row;
     }
+
+    /**
+     * Выборка всей записи
+     */
+    public function selectAll(string $table_name = "", array $fields = [], array $search = [])
+    {
+        $stmt = $this->select($table_name, $fields, $search);
+        $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $row;
+    }
+
+    public function getRecordsWithCommentsByPage($page = 1)
+    {
+        $offset = $page*15-15;
+        $sql = "SELECT r.*, c.id as comment_id, c.name as comment_name, c.message as comment_message FROM records r LEFT JOIN ( SELECT *, ROW_NUMBER() OVER (PARTITION BY record_id ORDER BY id DESC) AS row_num FROM comments ) c ON r.id = c.record_id AND c.row_num <= 3 WHERE r.id IN (SELECT * FROM (SELECT id FROM records WHERE 1 ORDER BY id DESC LIMIT 15 OFFSET $offset) as s); ";
+        $stm = $this->pdo->prepare($sql);
+        $stm->execute();
+        return $stm->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

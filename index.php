@@ -64,5 +64,6 @@ catch(ValidationException $e)
 }
 catch (\PDOException $e)
 {
+    var_dump($e);
     echo 'Ошибка с бд ';
 }
