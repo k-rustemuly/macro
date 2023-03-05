@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+    php:
+        container_name: php-apache
+        image: php:8.1-apache
+        build:
+            context: ./
+        volumes:
+            - ./:/var/www/html/
+        ports:
+            - "80:80"
+        depends_on:
+            - database
+    database:
+        image: mysql:8.0
+        ports:
+            - 3306:3306
+        environment:
+            - MYSQL_DATABASE=macro
+            - MYSQL_USER=macro_user
+            - MYSQL_PASSWORD=macro_password
+            - MYSQL_ROOT_PASSWORD=password
+        volumes:
+            - ./dump:/docker-entrypoint-initdb.d
+            - db-data:/var/lib/mysql
+volumes :
+    db-data: ~

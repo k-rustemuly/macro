@@ -6,15 +6,7 @@ use app\exception\NotFoundException;
 use app\exception\ValidationException;
 
 $requestMethod = $_SERVER["REQUEST_METHOD"];
-$uri = getUri();
-$eUri = explodeUri($uri);
-
-function getUri() :string
-{
-    $mainPath = str_replace("index.php", '', $_SERVER["PHP_SELF"]);
-    $path = str_replace($mainPath, '', $_SERVER["REQUEST_URI"]);
-    return $path;
-}
+$eUri = explodeUri($_SERVER["REQUEST_URI"]);
 
 function explodeUri(string $uri = null)
 {

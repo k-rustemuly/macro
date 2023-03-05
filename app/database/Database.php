@@ -5,10 +5,10 @@ use PDO;
 
 class Database
 {
-    private $host = '127.0.0.1';
+    private $host = 'database';
     private $db   = 'macro';
-    private $user = 'root';
-    private $pass = '';
+    private $user = 'macro_user';
+    private $pass = 'macro_password';
     private $charset = 'utf8';
     private $pdo;
 
